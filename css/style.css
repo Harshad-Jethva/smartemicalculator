@@ -1,19 +1,29 @@
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #cbd5e1;
+    /* Light mode thumb */
     border-radius: 4px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+    /* Dark mode thumb */
+}
+
 ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
     background: #475569;
 }
 
@@ -26,9 +36,7 @@ input[type=range] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    /* Specific width is required for Firefox. */
     background: transparent;
-    /* Otherwise white in Chrome */
 }
 
 input[type=range]::-webkit-slider-thumb {
@@ -40,7 +48,6 @@ input[type=range]::-webkit-slider-thumb {
     border: 4px solid #4f46e5;
     cursor: pointer;
     margin-top: -8px;
-    /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: transform 0.1s;
 }
@@ -78,16 +85,21 @@ input[type=range]::-moz-range-thumb {
     animation: fadeInUp 0.8s ease-out forwards;
 }
 
-/* Glassmorphism Utilities */
-.glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Thumb Indicator (Floating value above slider) - Not used in new design but kept for legacy needs */
+/* Thumb Indicator */
 .thumb-indicator {
     pointer-events: none;
     transition: left 0.1s ease-out;
+}
+
+/* Custom Scrollbar class for containers */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
 }
