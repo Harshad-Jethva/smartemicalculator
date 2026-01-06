@@ -9,8 +9,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    /* Light mode thumb */
+    background: #cfbaf0;
+    /* Pastel Mauve */
     border-radius: 4px;
 }
 
@@ -20,18 +20,21 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #a3c4f3;
+    /* Pastel Blue */
 }
 
 html {
     scroll-behavior: smooth;
+    background-color: #fbf8cc55;
+    /* Slight tint of lemon */
 }
 
-/* Range Slider Customization */
+.dark html {
+    background-color: #0f172a;
+}
+
+/* Range Slider Customization - Pastel Version */
 input[type=range] {
     -webkit-appearance: none;
     appearance: none;
@@ -45,30 +48,40 @@ input[type=range]::-webkit-slider-thumb {
     width: 24px;
     border-radius: 50%;
     background: #ffffff;
-    border: 4px solid #4f46e5;
+    border: 4px solid #a3c4f3;
+    /* Pastel Blue */
     cursor: pointer;
     margin-top: -8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: transform 0.1s;
 }
 
 input[type=range]::-webkit-slider-thumb:hover {
     transform: scale(1.1);
+    border-color: #cfbaf0;
+    /* Pastel Mauve */
 }
 
-/* Firefox */
-input[type=range]::-moz-range-thumb {
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 4px solid #4f46e5;
-    cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: transform 0.1s;
+/* Glassmorphism Refined for Pastel */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass-panel {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Animations */
+/* Removed old keyframes to let GSAP handle it, but keeping util classes */
+.animate-fade-in-up {
+    /* Handled by GSAP now, but keeping for non-JS fallback if needed */
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -79,10 +92,6 @@ input[type=range]::-moz-range-thumb {
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
-}
-
-.animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
 }
 
 /* Thumb Indicator */

@@ -103,20 +103,15 @@
     // Export Logic
     function exportToCSV() {
         if(!historyData.length) return alert('No data to export');
-        
-        const worksheet = XLSX.utils.json_to_sheet(historyData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "History");
-        XLSX.writeFile(workbook, "EMI_History.csv");
+        ExportManager.generateCSV(historyData);
     }
 
     function exportToPDF() {
         if(!historyData.length) return alert('No data to export');
         
-        const { javascript } = window.jspdf; 
-        // Note: jspdf.umd.min.js exports to window.jspdf.jsPDF usually, but specific call depends on version.
-        // Using the global jsPDF object.
-        const doc = new jspdf.jsPDF();
+        if(!window.jspdf) return alert('PDF Library not loaded');
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF();
         
         doc.setFontSize(18);
         doc.text("Smart EMI - Calculation History", 14, 22);
@@ -141,7 +136,7 @@
             startY: 30,
             theme: 'grid',
             styles: { fontSize: 10, cellPadding: 3 },
-            headStyles: { fillColor: [79, 70, 229] } // Brand color
+            headStyles: { fillColor: [79, 70, 229] } 
         });
 
         doc.save("EMI_History.pdf");

@@ -14,11 +14,11 @@ class Database {
         $this->conn = null;
 
         try {
-            // Uncomment for MySQL
-            // $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            // MySQL Connection (Active)
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             
-            // Using SQLite for seamless demo without config
-            $this->conn = new PDO("sqlite:../includes/smart_emi.sqlite");
+            // SQLite (Commented out)
+            // $this->conn = new PDO("sqlite:../includes/smart_emi.sqlite");
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
             // Create table if not exists
@@ -33,7 +33,8 @@ class Database {
             $this->conn->exec($query);
 
         } catch(PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
+            // echo "Connection error: " . $exception->getMessage(); // Silent fail to prevent JSON corruption
+            error_log("Connection error: " . $exception->getMessage());
         }
 
         return $this->conn;

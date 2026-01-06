@@ -20,41 +20,35 @@
             theme: {
                 extend: {
                     colors: {
+                        pastel: {
+                            lemon: '#fbf8cc',
+                            powder: '#fde4cf',
+                            rose: '#ffcfd2',
+                            orchid: '#f1c0e8',
+                            mauve: '#cfbaf0',
+                            blue: '#a3c4f3',
+                            frosted: '#90dbf4',
+                            aqua: '#8eecf5',
+                            marine: '#98f5e1',
+                            celadon: '#b9fbc0',
+                        },
                         brand: {
-                            500: '#6366f1', // Indigo
-                            600: '#4f46e5',
-                            accent: '#10b981', // Emerald
-                            dark: '#0f172a',
+                            500: '#cfbaf0', // Mauve as primary
+                            600: '#a3c4f3', // Blue as secondary
+                            accent: '#98f5e1', // Aquamarine
+                            dark: '#1e1e2e',
                         },
                         dark: {
-                            bg: '#0f172a', // Slate 900
-                            card: '#1e293b', // Slate 800
-                            hover: '#334155',
-                        },
-                        light: {
-                            bg: '#f8fafc', // Slate 50
-                            card: '#ffffff',
-                            text: '#1e293b',
+                            bg: '#0f172a', 
+                            card: '#1e293b',
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         heading: ['Outfit', 'sans-serif'],
                     },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        },
-                        fadeInUp: {
-                            'from': { opacity: 0, transform: 'translate3d(0, 40px, 0)' },
-                            'to': { opacity: 1, transform: 'translate3d(0, 0, 0)' }
-                        }
+                    backgroundImage: {
+                        'pastel-gradient': 'linear-gradient(135deg, #fbf8cc 0%, #ffcfd2 25%, #cfbaf0 50%, #8eecf5 75%, #b9fbc0 100%)',
                     }
                 }
             }
@@ -64,16 +58,24 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <!-- Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>window.jsPDF = window.jspdf.jsPDF;</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
     
-    <!-- Chart.js -->
+    <!-- Logic -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/export-logic.js"></script>
+    <script src="js/visual-effects.js" defer></script>
 </head>
 <body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-white font-sans overflow-x-hidden relative min-h-screen flex flex-col transition-colors duration-300">
 
@@ -109,6 +111,9 @@
                         <a href="history.php" class="font-medium text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-white transition-colors relative group">
                             History
                         </a>
+                        <a href="chatbot.php" class="font-medium text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-white transition-colors relative group">
+                            AI Chat
+                        </a>
                         <a href="features.php" class="font-medium text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-white transition-colors">Features</a>
                     </div>
 
@@ -120,8 +125,8 @@
                             <i class="fa-solid fa-moon hidden dark:block"></i>
                         </button>
 
-                        <a href="calculator.php#ai-insights" class="hidden lg:block font-medium text-white px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-500 hover:shadow-lg hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
-                            AI Chat ✨
+                        <a href="chatbot.php" class="hidden lg:block font-medium text-white px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-500 hover:shadow-lg hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
+                            Ask AI ✨
                         </a>
                     </div>
                 </div>

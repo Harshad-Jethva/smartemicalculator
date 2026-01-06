@@ -15,9 +15,9 @@
                     <i class="fa-solid fa-sliders text-brand-500"></i> Loan Parameters
                 </h3>
                 <div class="flex gap-2">
-                    <button class="text-xs font-semibold px-3 py-1 rounded bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 border border-brand-200 dark:border-brand-500/30">Home Loan</button>
-                    <button class="text-xs font-semibold px-3 py-1 rounded bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400 border border-transparent hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Personal</button>
-                    <button class="text-xs font-semibold px-3 py-1 rounded bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400 border border-transparent hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Car</button>
+                    <button id="btn-home-loan" class="text-xs font-semibold px-3 py-1 rounded bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 border border-brand-200 dark:border-brand-500/30">Home Loan</button>
+                    <button id="btn-personal-loan" class="text-xs font-semibold px-3 py-1 rounded bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400 border border-transparent hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Personal</button>
+                    <button id="btn-car-loan" class="text-xs font-semibold px-3 py-1 rounded bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400 border border-transparent hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">Car</button>
                 </div>
             </div>
 

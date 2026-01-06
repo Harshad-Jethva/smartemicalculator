@@ -270,115 +270,111 @@ const updateAiTip = (P, annualRate, years, totalInterest) => {
     if (aiDynamicMsg) aiDynamicMsg.innerText = msg;
 };
 
-// Chat Simulation
-const addMessage = (text, isUser = false) => {
-    const div = document.createElement('div');
-    div.className = `flex items-start gap-4 ${isUser ? 'flex-row-reverse' : ''}`;
-
-    // Updated styling for light/dark
-    const icon = isUser ? '<i class="fa-solid fa-user text-white text-sm"></i>' : '<i class="fa-solid fa-robot text-white text-sm"></i>';
-    const bgClass = isUser ? 'bg-brand-600 text-white' : 'bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 text-gray-700 dark:text-gray-200 shadow-sm';
-    const rounded = isUser ? 'rounded-tr-none' : 'rounded-tl-none';
-    const align = isUser ? 'ms-auto' : '';
-
-    div.innerHTML = `
-        <div class="w-10 h-10 rounded-full ${isUser ? 'bg-gray-600' : 'bg-gradient-to-tr from-brand-500 to-brand-accent'} flex items-center justify-center shrink-0">
-            ${icon}
-        </div>
-        <div class="${bgClass} rounded-2xl ${rounded} p-4 max-w-[80%] ${align}">
-            <p class="text-sm leading-relaxed">${text}</p>
-        </div>
-    `;
-
-    if (chatMessages) {
-        chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-};
-
+// Chat Simulation (Widget removed, redirecting to chatbot.php)
 if (chatForm) {
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const query = chatInput.value.trim();
-        if (!query) return;
-
-        addMessage(query, true);
-        chatInput.value = '';
-
-        // Simulate AI typing delay
-        setTimeout(() => {
-            let response = "That's a great question. Based on your current EMI of ₹" + statEmi.innerText + ", ";
-
-            const q = query.toLowerCase();
-            if (q.includes('reduce') || q.includes('save') || q.includes('interest')) {
-                response += "the best way to reduce interest is to make part-prepayments. Even paying ₹50,000 extra annually can save you lakhs in the long run.";
-            } else if (q.includes('limit') || q.includes('afford') || q.includes('salary')) {
-                response += "financial experts suggest your EMI should not exceed 40% of your monthly in-hand income.";
-            } else {
-                response += "I'd recommend consulting a financial advisor for that specific scenario, but generally, lower tenure equals lower interest outflow.";
-            }
-
-            addMessage(response, false);
-        }, 1000);
+        window.location.href = 'chatbot.php';
     });
 }
 
 
-// Generate Report Handler (Connects to Backend)
+// Generate Report Handler (Connects to Backend + Exports)
 const finalReportBtn = document.getElementById('get-report-btn');
 if (finalReportBtn) {
     finalReportBtn.addEventListener('click', async () => {
         const btn = finalReportBtn;
         const originalText = btn.innerHTML;
 
+        // Data Preparation
+        const P = parseFloat(amountInput.value);
+        const R = parseFloat(rateInput.value);
+        const N = parseFloat(tenureInput.value); // Years assumed based on UI default
+        const emiVal = currentEMI;
+        const totalInt = currentTotalInterest;
+        const totalPay = P + totalInt;
+
+        // Generate Amortization Data for Report
+        const schedule = [];
+        let balance = P;
+        const r_mon = R / 12 / 100;
+        const n_mon = N * 12;
+
+        // Year-wise for report (to keep it concise)
+        let principalYearly = 0;
+        let interestYearly = 0;
+
+        for (let m = 1; m <= n_mon; m++) {
+            const interest = balance * r_mon;
+            const principal = emiVal - interest;
+            interestYearly += interest;
+            principalYearly += principal;
+            balance -= principal;
+
+            if (m % 12 === 0 || m === n_mon) {
+                schedule.push({
+                    year: Math.ceil(m / 12),
+                    principal: Math.round(principalYearly),
+                    interest: Math.round(interestYearly),
+                    balance: Math.round(Math.max(0, balance))
+                });
+                principalYearly = 0;
+                interestYearly = 0;
+            }
+        }
+
         // Loading State
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
         btn.disabled = true;
 
         const payload = {
-            amount: parseFloat(amountInput.value),
-            rate: parseFloat(rateInput.value),
-            tenure: parseFloat(tenureInput.value),
-            emi: currentEMI
+            amount: P,
+            rate: R,
+            tenure: N,
+            emi: emiVal
         };
 
+        // 1. Save to Backend (Attempt)
         try {
-            // Attempt to save to backend
             const response = await fetch('api/save_history.php', {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: { 'Content-Type': 'application/json' }
             });
-
             const result = await response.json();
-            console.log('Saved:', result);
+            if (response.ok) {
+                showToast("Calculation Saved!", "success");
+            } else {
+                console.warn("Backend Error:", result);
+                showToast("Saved locally (Backend issue)", "info");
+            }
+        } catch (e) {
+            console.error("Network/DB Error:", e);
+            showToast("Offline Mode: PDF Generating...", "info");
+        }
 
-            showToast("Calculation Verified & Saved!", "success");
+        // 2. Export PDF (Always Run)
+        try {
+            ExportManager.generatePDF(
+                { amount: P, rate: R, tenure: N, emi: emiVal, totalInterest: totalInt, totalPayment: totalPay },
+                schedule
+            );
+        } catch (exportErr) {
+            console.error("Export Error", exportErr);
+            showToast("PDF Generation Failed", "error");
+        }
 
-            // Simulate PDF Download
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved';
-                btn.classList.remove('bg-gray-900', 'dark:bg-white', 'text-white', 'dark:text-dark-bg');
-                btn.classList.add('bg-green-500', 'text-white');
+        // 3. Reset Button
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Report Downloaded';
+            btn.classList.add('bg-green-500', 'text-white');
 
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    // Restore classes logic (simplified)
-                    btn.classList.add('bg-gray-900', 'text-white');
-                    btn.classList.remove('bg-green-500', 'text-white');
-                }, 3000);
-            }, 800);
-
-        } catch (error) {
-            console.error('Error saving history:', error);
-            showToast("Failed to save calculation.", "error");
-            btn.innerHTML = 'Error';
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+                btn.classList.remove('bg-green-500', 'text-white');
             }, 2000);
-        }
+        }, 500);
     });
 }
 
@@ -410,6 +406,63 @@ const showToast = (message, type = "info") => {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 };
+
+// Loan Type Logic
+const btnHome = document.getElementById('btn-home-loan');
+const btnPersonal = document.getElementById('btn-personal-loan');
+const btnCar = document.getElementById('btn-car-loan');
+
+const setLoanType = (type) => {
+    // Reset Styles
+    const inactiveClass = "text-xs font-semibold px-3 py-1 rounded bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400 border border-transparent hover:bg-gray-200 dark:hover:bg-white/10 transition-colors";
+    const activeClass = "text-xs font-semibold px-3 py-1 rounded bg-brand-50 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300 border border-brand-200 dark:border-brand-500/30";
+
+    btnHome.className = type === 'home' ? activeClass : inactiveClass;
+    btnPersonal.className = type === 'personal' ? activeClass : inactiveClass;
+    btnCar.className = type === 'car' ? activeClass : inactiveClass;
+
+    // Set Defaults
+    if (type === 'home') {
+        amountInput.value = 5000000;
+        amountRange.max = 10000000;
+        rateInput.value = 8.5;
+        tenureInput.value = 20;
+        tenureRange.max = 30;
+    } else if (type === 'personal') {
+        amountInput.value = 500000;
+        amountRange.max = 2500000;
+        rateInput.value = 11.5;
+        tenureInput.value = 3;
+        tenureRange.max = 7;
+    } else if (type === 'car') {
+        amountInput.value = 1000000;
+        amountRange.max = 5000000;
+        rateInput.value = 9.0;
+        tenureInput.value = 5;
+        tenureRange.max = 10;
+    }
+
+    // Trigger Update
+    amountRange.value = amountInput.value;
+    rateRange.value = rateInput.value;
+    tenureRange.value = tenureInput.value;
+
+    // Update labels/progress
+    document.getElementById('amount-val').innerText = formatCurrency(amountInput.value);
+    document.getElementById('rate-val').innerText = rateInput.value;
+
+    updateSliderProgress(amountRange, 'amount-thumb', 'amount-progress');
+    updateSliderProgress(rateRange, 'rate-thumb', 'rate-progress');
+    updateSliderProgress(tenureRange, 'tenure-thumb', 'tenure-progress');
+
+    calculateEMI();
+};
+
+if (btnHome) {
+    btnHome.addEventListener('click', () => setLoanType('home'));
+    btnPersonal.addEventListener('click', () => setLoanType('personal'));
+    btnCar.addEventListener('click', () => setLoanType('car'));
+}
 
 // Theme Switching
 if (themeBtn) {

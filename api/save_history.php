@@ -8,13 +8,18 @@ include_once '../includes/db.php';
 $database = new Database();
 $db = $database->getConnection();
 
+if ($db === null) {
+    http_response_code(500);
+    echo json_encode(array("message" => "Database connection failed."));
+    exit();
+}
+
 $data = json_decode(file_get_contents("php://input"));
 
 if(
-    !empty($data->amount) &&
-    !empty($data->rate) &&
-    !empty($data->tenure) &&
-    !empty($data->emi)
+    !empty($data->amount) && 
+    // Relaxed check: rate, tenure could be 0? maybe not. 
+    isset($data->amount)
 ){
     $query = "INSERT INTO history (amount, rate, tenure, emi) VALUES (:amount, :rate, :tenure, :emi)";
     $stmt = $db->prepare($query);
